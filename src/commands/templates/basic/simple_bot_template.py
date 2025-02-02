@@ -1,16 +1,11 @@
-# discord-package/discord_package/cli.py
 import os
-import sys
+from rich.console import Console
 
-def create_project(project_name):
-    # Obtener el directorio actual de trabajo
-    current_directory = os.getcwd()
-    
-    # Crear el directorio del nuevo proyecto
-    project_directory = os.path.join(current_directory, project_name)
+console = Console()
 
-    try:
-        # Crear directorios principales y archivos
+def bot():
+  try:
+     # Crear directorios principales y archivos
         os.makedirs(project_directory)
         print(f"Proyecto '{project_name}' creado en {project_directory}")
 
@@ -43,45 +38,45 @@ def create_project(project_name):
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>Monitor de Logs</h1>
+    <h1>Monitor (ALPHA)</h1>
 
-    <!-- Filtros -->
+    <!-- Filters -->
     <div class="filters">
       <input
         type="text"
         id="filterGuild"
-        placeholder="Filtrar por nombre de servidor"
+        placeholder="Filter by server name"
       />
       <input
         type="text"
         id="filterGuildId"
-        placeholder="Filtrar por ID de servidor"
+        placeholder="Filter by Server ID"
       />
       <input
         type="text"
         id="filterUser"
-        placeholder="Filtrar por nombre de usuario"
+        placeholder="Filter by user name"
       />
-      <input type="date" id="filterDate" placeholder="Filtrar por fecha" />
-      <button onclick="applyFilters()">Aplicar Filtros</button>
-      <button onclick="resetFilters()">Restablecer Filtros</button>
+      <input type="date" id="filterDate" placeholder="Filter by date" />
+      <button onclick="applyFilters()">Apply Filters</button>
+      <button onclick="resetFilters()">Reset Filters</button>
     </div>
 
-    <!-- Tabla de logs -->
+    <!-- Logs -->
     <table id="logsTable">
       <thead>
         <tr>
           <th>Timestamp</th>
-          <th>Usuario</th>
-          <th>Servidor</th>
-          <th>ID del Servidor</th>
-          <th>Canal</th>
-          <th>ID del Canal</th>
-          <th>Mensaje</th>
+          <th>User</th>
+          <th>Server</th>
+          <th>ID - Server</th>
+          <th>Channel</th>
+          <th>ID - Channel</th>
+          <th>Message</th>
         </tr>
       </thead>
       <tbody id="logsBody">
-        <!-- Los logs se insertarán aquí -->
+        <!-- Logs will be inserted here -->
       </tbody>
     </table>
 
@@ -235,9 +230,9 @@ from buttons.buttons_help import ButtonsHelp
 async def ping_layout(interaction, latency):
     try:
         embed = discord.Embed(title="🏓 Pong", description=f"{interaction.user.mention} {latency} ms / Pong!", color=0x00ff00)
-        embed.set_image(url="https://cusoft.tech/wp-content/uploads/2024/07/image-24.jpg")  # -> se pueden adjuntar imagenes por url externa
+        embed.set_image(url="https://cusoft.tech/wp-content/uploads/2024/07/image-24.jpg")  # -> images can be attached by external url
         embed.set_footer(text="💻 Polaris", icon_url="https://cusoft.tech/wp-content/uploads/2024/05/working.gif")
-        await interaction.response.send_message(embed=embed, ephemeral=True, view=ButtonsHelp()) # -> view=ButtonsHelp() para mostrar los botones
+        await interaction.response.send_message(embed=embed, ephemeral=True, view=ButtonsHelp()) # -> view=ButtonsHelp() to display the buttons
     except Exception as e:
         return e
 """),
@@ -280,7 +275,7 @@ async def error_message(e, interaction, msg):
         embed.color = 0x0fffff
         await interaction.response.send_message(embed=embed, ephemeral=True, view=ButtonsHelp())
         
-        # Registrar el error en el archivo de log
+        # Record the error in the log file
         await logguer(interaction, "logs.txt", f"Error: -> Command: {msg}")
 
     except Exception as e:
@@ -336,7 +331,7 @@ async def logguer(interaction, file_name, msg):
 
 """),
             ('functions', 'file_manager.py', """
-# En proceso de actualizacion 
+# In the process of being updated 
 # 
 # 
 # import os
@@ -525,7 +520,7 @@ class ChangeHandler(FileSystemEventHandler):
 
 if __name__ == "__main__":
     root_path = os.getcwd()  # Monitorear toda la carpeta raíz del proyecto
-    command = "python security_bot.py"  # Comando para ejecutar el bot
+    command = "python bot.py"  # Comando para ejecutar el bot
 
     event_handler = ChangeHandler(command, root_path)
 
@@ -558,7 +553,7 @@ if __name__ == "__main__":
             # bot.py
             ('', 'bot.py', """
 
-# Importar módulos necesarios
+# Import required modules
 import asyncio
 import discord
 from discord.ext import commands
@@ -568,32 +563,32 @@ from utils.error_message import error_message
 from commands.ping import ping_layout
 from functions.print_logs import logguer
 
-# Configuración del bot
+# Bot configuration
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 intents.reactions = True
 bot = commands.Bot(command_prefix='/', intents=intents)
 
-# Evento de inicio del bot
+# Bot startup event
 @bot.event
 async def on_ready():
     print("Bot is Up and Ready!")
     try:
         synced = await bot.tree.sync()
-        print(f'{bot.user} se ha conectado a Discord!')
+        print(f'{bot.user} has connected to Discord!')
     except Exception as e:
         print(e)
         
 
-# Comando de ping
+# Ping command
 @bot.tree.command(name="ping", 
                   description="Ping the bot")
 async def ping_command(interaction: discord.Interaction):
     try:
         await logguer(interaction, "logs.txt", f"Execution: -> Command: Ping")
         
-        # luego del registro, enviar la response
+        # after registration, send the response
         await ping_layout(interaction, round(bot.latency * 1000))
     except Exception as e:
         await error_message(e,
@@ -618,22 +613,5 @@ bot.run(TOKEN)
                 f.write(content)  # Añade contenido al archivo
             print(f"Archivo '{file_path}' creado con contenido.")
 
-        print("Estructura de proyecto creada con éxito.")
-
-    except Exception as e:
-        print(f"Error al crear el proyecto: {e}")
-
-def main():
-    if len(sys.argv) < 3:
-        print("Uso: dcp create <nombre_del_proyecto>")
-        sys.exit(1)
-
-    command = sys.argv[1]
-    if command == "create":
-        project_name = sys.argv[2]
-        create_project(project_name)
-    else:
-        print(f"Comando desconocido: {command}")
-
-if __name__ == "__main__":
-    main()
+  except Exception as e:
+    console.print("Error")

@@ -3,11 +3,11 @@ from setuptools import setup, find_packages
 
 setup(
     name='discord-package',
-    version='0.0.4',
+    version='1.0.0',
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'dcp=discord_package.cli:main',
+            'dcp=src.cli:main',
         ],
     },
     install_requires=[
@@ -18,12 +18,12 @@ setup(
         'requests',
         'rich',
     ],
-    description='A packager to create Discord bots easily',
+    description='A packager to create and manage Discord bots easily (in Windows)',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/MrWiki15/discord-package', 
-    author='Polaris Web3',
-    author_email='universe@polarisweb3.org',
+    author='Wilkenson Canton',
+    author_email='mrwiki@cusoft.tech',
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
